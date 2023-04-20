@@ -1,30 +1,39 @@
 <?php
 
-$username = 'orsifrancesco'; // <-- add your username here.. that's it!!
+// type can be 'tag' or 'user'
+$type = 'user';
+
+// if type is 'tag', the script will search for #orsifrancesco
+// if type is 'user', the script will search for @orsifrancesco
+$value = 'orsifrancesco';
+
+// --------------------------------------------------
 
 header('Content-Type: application/json; charset=utf-8');
-$username = strtolower($username);
+$value = strtolower($value);
 $context = stream_context_create(array('http' => array('ignore_errors' => true)));
-$inputUrl = file_get_contents('https://orsi.me/sniffagram/?user=' . $username, false, $context);
+$inputUrl = file_get_contents('https://orsi.me/sniffagram/?' . (($type !== 'tag' && $type !== 'user') ? 'tag' : $type) . '=' . $value, false, $context);
 
 $input = $inputUrl ? json_decode($inputUrl, TRUE) : array();
 $inputData = $input && $input['data'] ? $input : array('data' => array());
-$imagesFolder = 'images/' . $username;
+$imagesFolder = 'images/' . $type . '/' . $value;
 
 if (!file_exists('temp')) { mkdir('temp', 0777, true); }
-if (!file_exists('temp/' . $username)) { mkdir('temp/' . $username, 0777, true); }
+if (!file_exists('temp/' . $type)) { mkdir('temp/' . $type, 0777, true); }
+if (!file_exists('temp/' . $type . '/' . $value)) { mkdir('temp/' . $type . '/' . $value, 0777, true); }
 if (!file_exists('images')) { mkdir('images', 0777, true); }
-if (!file_exists($imagesFolder)) { mkdir('images/' . $username, 0777, true); }
+if (!file_exists('images/' . $type)) { mkdir('images/' . $type, 0777, true); }
+if (!file_exists($imagesFolder)) { mkdir($imagesFolder, 0777, true); }
 
 $output = array(
-	'username' => $username,
+	$type => $value,
 	'http_response_header' => $http_response_header,
 	'timestamp' => time()
 );
 if($inputData['remainingDailyRequests']) $output['remainingDailyRequests'] = $inputData['remainingDailyRequests'];
 for($i = 0; $i < count($inputData['data']); $i++) {
 	$url = $inputData['data'][$i]['imageUrl'];
-	$checksum = "temp/" . $username . '/' . md5($url);
+	$checksum = "temp/" . $type . '/' . $value . '/' . md5($url);
 	$checksumExist = file_exists($checksum);
 	if(!$checksumExist) {
 		$fileName = strtok(basename($url), '?');

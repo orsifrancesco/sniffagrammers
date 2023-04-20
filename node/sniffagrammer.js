@@ -1,7 +1,16 @@
 const https = require('https');
 const fs = require('fs');
 
-const username = 'orsifrancesco'; // <-- Change this to your Instagram username 
+// type can be 'tag' or 'user'
+const type = 'user'
+
+// if type is 'tag', the script will search for #orsifrancesco
+// if type is 'user', the script will search for @orsifrancesco
+const value = 'orsifrancesco'
+
+// only for sniffagrammer.js
+// you can change the port of the server
+const port = 8080
 
 function checksumJs(str, seed = 0) {
   let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
@@ -19,7 +28,7 @@ function checksumJs(str, seed = 0) {
 
 async function downloadImg({ url, imagesFolder }) {
   return new Promise((resolve, reject) => {
-    const checksum = `temp/${username}/${checksumJs(url)}`;
+    const checksum = `temp/${type}/${value}/${checksumJs(url)}`;
     const checksumExist = fs.existsSync(checksum);
     if (!checksumExist) {
       https.get(url, (res) => {
@@ -52,7 +61,7 @@ async function downloadImg({ url, imagesFolder }) {
 
 async function getImages() {
 
-  const imagesFolder = `images/${username}`;
+  const imagesFolder = `images/${type}/${value}`;
 
   const options = {
     headers: {
@@ -62,7 +71,7 @@ async function getImages() {
 
   return new Promise((resolve, reject) => {
 
-    https.get(`https://orsi.me/sniffagram/?user=${username}`, options, (res) => {
+    https.get(`https://orsi.me/sniffagram/?${(type !== 'tag' && type !== 'user') ? 'tag' : type}=${value}`, options, (res) => {
 
       let inputUrl = '';
       res.on('data', (chunk) => {
@@ -73,12 +82,13 @@ async function getImages() {
         const inputData = input && input.data ? input : { data: [] };
 
         if (!fs.existsSync('temp')) fs.mkdirSync('temp', { recursive: true });
-        if (!fs.existsSync(`temp/${username}`)) fs.mkdirSync(`temp/${username}`, { recursive: true });
+        if (!fs.existsSync(`temp/${type}`)) fs.mkdirSync(`temp/${type}`, { recursive: true });
+        if (!fs.existsSync(`temp/${type}/${value}`)) fs.mkdirSync(`temp/${type}/${value}`, { recursive: true });
         if (!fs.existsSync('images')) fs.mkdirSync('images', { recursive: true });
         if (!fs.existsSync(imagesFolder)) fs.mkdirSync(imagesFolder, { recursive: true });
 
         const output = {
-          username,
+          [type]: value,
           http_response_header: {
             status: res.statusCode,
             ...res.headers
@@ -89,7 +99,7 @@ async function getImages() {
 
         const newImagesDownloadedMapped = await Promise.all([...inputData?.data]?.map(async (el) => {
           const url = el.imageUrl;
-          const checksum = `temp/${username}/${checksumJs(url)}`;
+          const checksum = `temp/${type}/${value}/${checksumJs(url)}`;
           const checksumExist = fs.existsSync(checksum);
           if (!checksumExist) return await downloadImg({ url, imagesFolder })
           return null;
@@ -122,8 +132,7 @@ var http = require('http');
 http.createServer(async (req, res) => {
   if (req.url != '/favicon.ico') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    // res.write('Hello World!');
     const response = await getImages();
     res.end(response);
   }
-}).listen(8080); 
+}).listen(port); 
