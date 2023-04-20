@@ -52,23 +52,23 @@ Every time you open the URL, the script will call [Sniffagram](https://orsi.me/s
 
 On `images/{type}/` (where _type_ can be `tag` or `user`) you will see all the downloaded images.
 
-Every time you download a new image your will find the hash ([wikipedia](https://en.wikipedia.org/wiki/Hash_function)) of the image path on `temp/{type}/`.
+Every time you download a new image, you will find the hash ([wikipedia](https://en.wikipedia.org/wiki/Hash_function)) of the image path on `temp/{type}/`.
 
-These files are 0 bytes, they are necessary to prevent to download the same images (_if you delete these files the images will be downloaded again_).
+These files are 0 bytes, they are necessary to prevent downloading the same images (_if you delete these files the images will be downloaded again_).
 
 <img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/swyuwdylj66wtkz8zn72.png" alt="folders" style="display: block; max-width: 640px"/>
 
 
 ## Download images automatically every hour
 
-To call the URL automatically, you need to run a crontab ([wikipedia](https://en.wikipedia.org/wiki/Cron)) script. If you don't have crontab installed on your machine you can register to [crontaboo.com](https://crontaboo.com/) (_the free account gives you the possibility to call URLs every hour_).
+To call the URL automatically, you need to run a crontab ([wikipedia](https://en.wikipedia.org/wiki/Cron)) script. If you don't have crontab installed on your machine you can register at [crontaboo.com](https://crontaboo.com/) (_the free account gives you the possibility to call URLs every hour_).
 
 <img src="https://dev-to-uploads.s3.amazonaws.com/uploads/articles/4yz5jnwk003fpcehif2g.png" alt="crontaboo.com" style="display: block; max-width: 640px"/>
 
 
 ## Advanced way to do it
 
-[Sniffagram](https://orsi.me/sniffagram/) is an independent project gives you 30 calls a day (_enough for a call every hour_). It caches the output for 5 minutes.
+[Sniffagram](https://orsi.me/sniffagram/) is an independent project that gives you 30 calls a day (_enough for a call every hour_). It caches the output for 5 minutes.
 
 _Due to the high number of requests, sometimes the token used for the project expires prematurely making the service unavailable (usually the expired token is replaced after a few minutes)._
 
